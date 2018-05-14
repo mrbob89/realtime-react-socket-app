@@ -11,22 +11,26 @@ function createDrawing({ connection, name }) {
         .then(() => console.log('created drawing - ', name));
 }
 
+function subscribeToDrawings({ connection, client }) {
+    r.table('drawings')
+        .changes({ include_initial: true })
+        .run(connection)
+        .then(cursor => {
+            cursor.each(((err, drawingRow) => client.emit('drawing', drawingRow.new_val)));
+        });
+}
+
 r.connect({
     host: 'localhost',
     port: 28015,
     db: 'drawing_whiteboard'
 }).then(connection => {
     io.on('connection', client => {
-        client.on('subscribeToTimer', interval => {
-            r.table('timers')
-                .changes()
-                .run(connection)
-                .then(cursor => {
-                    cursor.each((err, timerRow) => {
-                        client.emit('timer', timerRow.new_val.timestamp);
-                    });
-                });
+        client.on('createDrawing', ({ name }) => {
+            createDrawing({ connection, name });
         });
+
+        client.on('subscribeToDrawings', () => subscribeToDrawings({ connection, client }));
     });
 });
 
