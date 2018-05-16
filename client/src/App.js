@@ -2,20 +2,44 @@ import React, { Component } from 'react';
 import './App.css';
 import DrawingForm from './DrawingForm';
 import DrawingList from './DrawingList';
+import Drawing from './Drawing';
+import Connection from './Connection';
 
 class App extends Component {
   state = {
-    timestamp: 'no time stamp'
+    selectedDrawing: ''
   };
 
+  handleSelectDrawing = drawing => {
+    this.setState(() => ({
+      selectedDrawing: drawing
+    }));
+  }
+
   render() {
+    let ctrl = (
+      <div>
+        <DrawingForm />
+        <DrawingList selectDrawing={this.handleSelectDrawing} />
+      </div>
+    );
+
+    if (this.state.selectedDrawing) {
+      ctrl = (
+        <Drawing
+          key={this.state.selectedDrawing.id}
+          drawing={this.state.selectedDrawing}
+        />
+      );
+    }
+
     return (
       <div className="App">
         <div className="App-header">
           <h2>Our awesome drawing app</h2>
         </div>
-        <DrawingForm />
-        <DrawingList />
+        <Connection />
+        {ctrl}
       </div>
     );
   }
