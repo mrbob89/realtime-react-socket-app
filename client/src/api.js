@@ -23,13 +23,13 @@ const sync = createSync({
         socket.emit('publishLine', line, () => {
             sent = true;
             resolve();
-
-            setTimeout(() => {
-                if (!sent) {
-                    reject();
-                }
-            }, 2000);
         });
+
+        setTimeout(() => {
+            if (!sent) {
+                reject();
+            }
+        }, 2000);
     })
 });
 
